@@ -19,6 +19,7 @@ This file describes what the current public source implements. It is not a roadm
 - minimal no-network example;
 - Telegram turn integration example;
 - tests for core protocol, ElevenLabs request shape, and Telegram voice upload behavior;
+- runtime-level fake transport tests proving Voice-only, exact-text fallback, Both text-first, and Both fail-soft behavior;
 - documentation for durable production delivery / recovery semantics;
 - a real-integration pitfalls guide covering the failure modes that shaped the design.
 
