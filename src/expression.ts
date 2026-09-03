@@ -33,7 +33,7 @@ export interface ResolveExpressionOptions {
 
 export interface ExpressionResolution {
   expression: ResolvedExpression;
-  /** The one canonical utterance, with only a valid Auto control marker removed. */
+  /** The one canonical utterance, with a valid leading control marker removed. */
   content: string;
   markerObserved: boolean;
 }
@@ -93,32 +93,10 @@ export function renderExpressionInstruction(
   ].join(" ");
 }
 
-/**
- * Resolve a requested mode against the one reply your agent already produced.
- *
- * - explicit Text never needs a marker;
- * - explicit Voice/Both can fail closed through the voice guard;
- * - Auto only trusts a marker on the first non-whitespace line;
- * - missing/malformed markers become Text without regeneration;
- * - performance directions stay inside canonical content byte-for-byte.
- */
-export function resolveExpression(
-  requested: ExpressionMode,
+/** Parse only a valid marker on the first non-whitespace line. */
+function parseLeadingExpressionMarker(
   rawReply: string,
-  options: ResolveExpressionOptions = {},
-): ExpressionResolution {
-  const rejectVoiceText = options.rejectVoiceText ?? containsCJK;
-
-  if (requested !== "auto") {
-    if (requested === "text") {
-      return { expression: "text", content: rawReply, markerObserved: false };
-    }
-    if (rejectVoiceText(rawReply)) {
-      return { expression: "text", content: rawReply, markerObserved: false };
-    }
-    return { expression: requested, content: rawReply, markerObserved: false };
-  }
-
+): { chosen: ResolvedExpression; content: string } | null {
   const lines = rawReply.split("\n");
   let markerLineIndex = -1;
   for (let index = 0; index < lines.length; index += 1) {
@@ -130,23 +108,61 @@ export function resolveExpression(
 
   const markerLine = markerLineIndex >= 0 ? (lines[markerLineIndex] ?? "").trim() : "";
   const match = MARKER_PATTERN.exec(markerLine);
-  if (match === null) {
+  if (match === null) return null;
+
+  return {
+    chosen: match[1] as ResolvedExpression,
+    content: lines
+      .slice(markerLineIndex + 1)
+      .join("\n")
+      .replace(/^\r?\n+/u, ""),
+  };
+}
+
+/**
+ * Resolve a requested mode against the one reply your agent already produced.
+ *
+ * - forced Text/Voice/Both remains host authority;
+ * - a valid accidental leading marker is stripped even in forced modes;
+ * - explicit Voice/Both can fail closed through the voice guard;
+ * - Auto only trusts a marker on the first non-whitespace line;
+ * - missing/malformed Auto markers become Text without regeneration;
+ * - performance directions stay inside canonical content byte-for-byte.
+ */
+export function resolveExpression(
+  requested: ExpressionMode,
+  rawReply: string,
+  options: ResolveExpressionOptions = {},
+): ExpressionResolution {
+  const rejectVoiceText = options.rejectVoiceText ?? containsCJK;
+  const marker = parseLeadingExpressionMarker(rawReply);
+
+  if (requested !== "auto") {
+    // Forced mode is host authority. If the model accidentally emits a valid
+    // Expression marker anyway, strip the reserved protocol line but never
+    // let it override the requested mode.
+    const content = marker?.content ?? rawReply;
+    const markerObserved = marker !== null;
+    if (requested === "text") {
+      return { expression: "text", content, markerObserved };
+    }
+    if (rejectVoiceText(content)) {
+      return { expression: "text", content, markerObserved };
+    }
+    return { expression: requested, content, markerObserved };
+  }
+
+  if (marker === null) {
     return { expression: "text", content: rawReply, markerObserved: false };
   }
 
-  const chosen = match[1] as ResolvedExpression;
-  const content = lines
-    .slice(markerLineIndex + 1)
-    .join("\n")
-    .replace(/^\r?\n+/u, "");
-
-  if (chosen === "text") {
-    return { expression: "text", content, markerObserved: true };
+  if (marker.chosen === "text") {
+    return { expression: "text", content: marker.content, markerObserved: true };
   }
 
-  if (content.trim().length === 0 || rejectVoiceText(content)) {
-    return { expression: "text", content, markerObserved: true };
+  if (marker.content.trim().length === 0 || rejectVoiceText(marker.content)) {
+    return { expression: "text", content: marker.content, markerObserved: true };
   }
 
-  return { expression: chosen, content, markerObserved: true };
+  return { expression: marker.chosen, content: marker.content, markerObserved: true };
 }
