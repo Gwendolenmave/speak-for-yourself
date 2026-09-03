@@ -1,0 +1,49 @@
+{
+  "name": "speak-for-yourself",
+  "version": "0.1.0-dev.0",
+  "private": true,
+  "description": "Let one AI choose Text, Voice, or Both without a translator or second agent.",
+  "keywords": [
+    "ai-agent",
+    "text-to-speech",
+    "telegram-bot",
+    "elevenlabs",
+    "multimodal",
+    "voice-agent"
+  ],
+  "type": "module",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "sideEffects": false,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.js"
+    }
+  },
+  "files": [
+    "build/",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "docs/"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('build',{recursive:true,force:true})\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run clean --silent && tsc -p tsconfig.json",
+    "test": "npm run build --silent && node --test build/tests/*.test.js",
+    "example:minimal": "npm run build --silent && node build/examples/minimal.js",
+    "verify": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.0"
+  }
+}
