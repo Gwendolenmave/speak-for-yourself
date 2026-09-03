@@ -4,13 +4,15 @@
 
 **One mind. Text, voice, or both.**
 
-Most AI voice bots do this:
+Sometimes a reply is better read. Sometimes you want to actually hear it.
+
+Most AI voice bots get there like this:
 
 ```text
 agent reply → translator / voice rewriter → TTS
 ```
 
-Speak for Yourself does this:
+Speak for Yourself keeps the original agent in the chair:
 
 ```text
                     ┌→ Text
@@ -23,7 +25,7 @@ one agent reply → Expression
 
 This repository is a small, provider-neutral reference implementation, using Telegram + ElevenLabs as the concrete example.
 
-## The idea in one turn
+## The whole trick in one turn
 
 Your existing agent still receives its normal persona, memory, tools, and conversation context. In `auto` mode it may return:
 
@@ -53,6 +55,8 @@ Performance directions such as `[softly]`, `[laughs]`, and `[sighs]` stay part o
 
 Text is the usual medium. Voice is an intentional choice. Both is rarer. The reference implementation uses no percentages, randomizers, topic heuristics, or second-model classifier.
 
+The interesting part is not that TTS can sound good. It is that **the sentence you hear is still the sentence your agent authored**.
+
 ## Try it
 
 Requires **Node.js 22.22+**.
@@ -65,7 +69,7 @@ npm run verify
 npm run example:minimal
 ```
 
-The minimal example uses no network calls or credentials.
+The minimal example uses no network calls or credentials. It just shows the protocol working end to end.
 
 ## Add it to an existing agent
 
@@ -144,5 +148,7 @@ Your host still owns the model provider, persona, memory, tools, transcript stor
 ## License
 
 [PolyForm Noncommercial License 1.0.0](LICENSE.md). Personal use, study, modification, and noncommercial sharing are permitted; commercial use requires separate permission.
+
+## Credits
 
 Created by **Gwendolen** with **AmeliaGPT**.
