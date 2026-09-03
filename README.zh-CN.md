@@ -4,13 +4,15 @@
 
 **同一个脑子。文字、语音，或者两者。**
 
-很多 AI 语音机器人实际上是这样：
+有些回复适合读。有些话，你就是会想真正听见它被说出来。
+
+很多 AI 语音机器人通常是这样：
 
 ```text
 agent 回复 → 翻译 / 语音改写模型 → TTS
 ```
 
-Speak for Yourself 是这样：
+Speak for Yourself 让原本那个 agent 一直坐在驾驶位：
 
 ```text
                     ┌→ Text
@@ -23,7 +25,7 @@ Speak for Yourself 是这样：
 
 这个仓库是一套小型、provider-neutral 的参考实现，Telegram + ElevenLabs 是具体示例。
 
-## 一轮就能看懂
+## 一轮就够了
 
 你原来的 agent 仍然拿到正常的 persona、memory、tools 和 conversation context。`auto` 模式下，它可能直接生成：
 
@@ -53,6 +55,8 @@ Host 只移除第一行控制 marker，留下唯一一条 canonical assistant re
 
 Text 是平常介质，Voice 是偶尔主动选择，Both 更少见。参考实现没有百分比、随机数、topic heuristic 或第二个 classifier model。
 
+真正有意思的不是 TTS 能有多像真人，而是：**你最后听见的，仍然是这个 agent 自己写下的那句话。**
+
 ## 跑一下
 
 需要 **Node.js 22.22+**。
@@ -65,7 +69,7 @@ npm run verify
 npm run example:minimal
 ```
 
-最小示例不联网，也不需要 credential。
+最小示例不联网，也不需要 credential，只演示这套协议从生成到解析完整走一遍。
 
 ## 接进已有 agent
 
@@ -144,5 +148,7 @@ Model provider、persona、memory、tools、transcript store、polling/webhook�
 ## License
 
 [PolyForm Noncommercial License 1.0.0](LICENSE.md)。允许个人使用、学习、修改和非商业分享；商业使用需要另行许可。
+
+## Credits
 
 Created by **Gwendolen** with **AmeliaGPT**.
