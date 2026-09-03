@@ -141,6 +141,7 @@ Your host still owns the model provider, persona, memory, tools, transcript stor
 | --- | --- |
 | wire it into your agent | [Integration](docs/INTEGRATION.md) |
 | understand the invariants | [Architecture](docs/ARCHITECTURE.md) |
+| see the mistakes that shaped the design | [Pitfalls](docs/PITFALLS.md) |
 | survive crashes / restarts | [Production](docs/PRODUCTION.md) |
 | inspect current implementation | [Status](docs/STATUS.md) |
 | understand privacy / secrets | [Privacy](docs/PRIVACY.md) |
