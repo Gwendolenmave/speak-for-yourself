@@ -41,7 +41,7 @@ Infrastructure retries already belonging to the host are not Expression calls. A
 
 ### A2. One canonical content string
 
-After a valid Auto marker is removed, the remaining content is the assistant reply.
+After a valid leading Expression marker is removed, the remaining content is the assistant reply.
 
 Performance directions are ordinary canonical content. The reference implementation does not split visible text, TTS script, and performance-tag metadata.
 
@@ -60,6 +60,8 @@ A marker later in the reply is content. A missing or malformed first-line marker
 ### A4. Forced mode is host authority
 
 When the host requested Text, Voice, or Both explicitly, that mode wins. The model is not asked to choose another mode.
+
+If the model nevertheless emits a **valid leading Expression marker**, strip the reserved protocol line so it cannot leak into visible text or TTS, but do not let it override the host-selected mode.
 
 A spoken-language guard may still downgrade explicit Voice/Both to Text when the already-produced content cannot satisfy the host's voice contract. That downgrade changes transport only.
 
@@ -91,6 +93,7 @@ If text fails, do not emit voice yet. If voice fails after text succeeds, the te
 | Failure | Required behavior |
 | --- | --- |
 | Auto marker missing / malformed | Text, same content, no model rerun |
+| valid marker appears in forced mode | strip marker; keep host-selected mode |
 | Voice-language guard fails | Text, same content, no translation |
 | Voice content exceeds provider bound | Text fallback (Voice) or text-only completion (Both) |
 | TTS fails | Text fallback for Voice; Both text stands |
