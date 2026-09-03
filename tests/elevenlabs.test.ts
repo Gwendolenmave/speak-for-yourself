@@ -17,10 +17,12 @@ test("Create Dialogue uses inputs[] and the expressive v3 model", () => {
     inputs: Array<{ text: string; voice_id: string }>;
     model_id: string;
     language_code: string;
+    input?: unknown;
   };
 
   assert.equal(request.url.startsWith("https://api.elevenlabs.io/v1/text-to-dialogue"), true);
   assert.equal(request.url.includes("output_format=mp3_44100_128"), true);
+  assert.equal(Object.hasOwn(body, "input"), false, "Create Dialogue uses plural inputs[]");
   assert.equal(body.inputs.length, 1);
   assert.equal(body.inputs[0]?.text, "[laughs] You knew.");
   assert.equal(body.inputs[0]?.voice_id, "voice-id");
