@@ -21,6 +21,35 @@ test("explicit Voice preserves performance directions", () => {
   });
 });
 
+test("forced mode strips an accidental valid marker without changing host authority", () => {
+  assert.deepEqual(
+    resolveExpression("voice", "[AGENT_EXPRESSION:both]\n[softly] I know."),
+    {
+      expression: "voice",
+      content: "[softly] I know.",
+      markerObserved: true,
+    },
+  );
+
+  assert.deepEqual(
+    resolveExpression("text", "[AGENT_EXPRESSION:voice]\nKeep this as text."),
+    {
+      expression: "text",
+      content: "Keep this as text.",
+      markerObserved: true,
+    },
+  );
+});
+
+test("performance directions are not mistaken for Expression markers", () => {
+  const raw = "[softly] I know.";
+  assert.deepEqual(resolveExpression("auto", raw), {
+    expression: "text",
+    content: raw,
+    markerObserved: false,
+  });
+});
+
 test("Auto strips a valid first non-whitespace marker", () => {
   assert.deepEqual(
     resolveExpression("auto", "\n[AGENT_EXPRESSION:voice]\n[laughs] You knew."),
