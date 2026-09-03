@@ -6,7 +6,9 @@ Initial public source candidate:
 
 - one-generation Text / Voice / Both / Auto Expression protocol;
 - first-non-whitespace control marker parsing and fail-closed resolution;
+- forced-mode authority with accidental valid marker stripping;
 - ElevenLabs `eleven_v3_conversational` Create Dialogue adapter;
 - Telegram `sendVoice` reference adapter;
 - minimal and Telegram integration examples;
-- production delivery and crash-recovery guidance.
+- production delivery and crash-recovery guidance;
+- hard-won integration pitfalls documented from a real live-bot implementation.
