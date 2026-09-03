@@ -40,34 +40,9 @@ export class TelegramVoiceSender {
         "voice.mp3",
       );
 
+      let response: Response;
       try {
-        const response = await this.fetchImpl(url, { method: "POST", body: form });
-        const responseText = await response.text();
-        let parsed: unknown = null;
-        try {
-          parsed = JSON.parse(responseText);
-        } catch {
-          parsed = null;
-        }
-
-        const ok =
-          response.ok &&
-          parsed !== null &&
-          typeof parsed === "object" &&
-          (parsed as Record<string, unknown>).ok === true;
-        if (ok) return;
-
-        const canRetry = attempt < this.maxAttempts - 1;
-        if (response.status === 429 && canRetry) {
-          const seconds = retryAfterSeconds(parsed) ?? 2;
-          await this.sleep(Math.min(30_000, Math.max(1_000, seconds * 1_000)));
-          continue;
-        }
-        if (response.status >= 500 && canRetry) {
-          await this.sleep(Math.min(8_000, 500 * 2 ** attempt));
-          continue;
-        }
-        throw new Error(`Telegram sendVoice HTTP ${response.status}`);
+        response = await this.fetchImpl(url, { method: "POST", body: form });
       } catch (error) {
         if (attempt >= this.maxAttempts - 1) {
           throw new Error("Telegram sendVoice failed", {
@@ -75,7 +50,36 @@ export class TelegramVoiceSender {
           });
         }
         await this.sleep(Math.min(8_000, 500 * 2 ** attempt));
+        continue;
       }
+
+      const responseText = await response.text();
+      let parsed: unknown = null;
+      try {
+        parsed = JSON.parse(responseText);
+      } catch {
+        parsed = null;
+      }
+
+      const ok =
+        response.ok &&
+        parsed !== null &&
+        typeof parsed === "object" &&
+        (parsed as Record<string, unknown>).ok === true;
+      if (ok) return;
+
+      const canRetry = attempt < this.maxAttempts - 1;
+      if (response.status === 429 && canRetry) {
+        const seconds = retryAfterSeconds(parsed) ?? 2;
+        await this.sleep(Math.min(30_000, Math.max(1_000, seconds * 1_000)));
+        continue;
+      }
+      if (response.status >= 500 && canRetry) {
+        await this.sleep(Math.min(8_000, 500 * 2 ** attempt));
+        continue;
+      }
+
+      throw new Error(`Telegram sendVoice HTTP ${response.status}`);
     }
   }
 }
