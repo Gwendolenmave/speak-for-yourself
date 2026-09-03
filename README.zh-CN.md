@@ -141,6 +141,7 @@ Model provider、persona、memory、tools、transcript store、polling/webhook�
 | --- | --- |
 | 接进自己的 agent | [Integration](docs/INTEGRATION.md) |
 | 理解 invariant | [Architecture](docs/ARCHITECTURE.md) |
+| 看看这套设计是被哪些坑逼出来的 | [Pitfalls](docs/PITFALLS.md) |
 | 处理 crash / restart | [Production](docs/PRODUCTION.md) |
 | 查看当前实现 | [Status](docs/STATUS.md) |
 | 理解 privacy / secrets | [Privacy](docs/PRIVACY.md) |
